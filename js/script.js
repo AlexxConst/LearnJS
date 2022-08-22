@@ -22,30 +22,66 @@ window.addEventListener('DOMContentLoaded', () => {
     addForm.addEventListener('submit', event => {
         event.preventDefault();
 
-        const newFilm = addInput.value;
+        let newFilm = addInput.value;
         const favorite = checkbox.checked;
 
-        movieDB.movies.push(newFilm);
-        movieDB.movies.sort();
+        if (newFilm) {
+            if (newFilm.length > 21) {
+                newFilm = `${newFilm.substring(0, 22)}...`;
+            }
+
+            if (favorite) {
+                console.log('Добовляем любимый фильм');
+            }
+
+            movieDB.movies.push(newFilm);
+            sortArr(movieDB.movies);
+
+            createMovieList(movieDB.movies, movieList);
+        }
+
+        event.target.reset();
     });
 
-    adv.forEach(item => {
-        item.remove();
-    });
+    const deleteAdv = arr => {
+        adv.forEach(item => {
+            item.remove();
+        });
+    };
 
-    genre.textContent = 'драма';
+    const makeChanges = () => {
+        genre.textContent = 'драма';
 
-    poster.style.backgroundImage = 'url("img/bg.jpg")';
+        poster.style.backgroundImage = 'url("img/bg.jpg")';
+    };
 
-    movieList.innerHTML = '';
+    const sortArr = arr => {
+        arr.sort();
+    };
 
-    movieDB.movies.sort();
+    function createMovieList(films, parent) {
+        parent.innerHTML = '';
+        sortArr(films);
 
-    movieDB.movies.forEach((film, i) => {
-        movieList.innerHTML += `
+        films.forEach((film, i) => {
+            parent.innerHTML += `
         <li class="promo__interactive-item">${i + 1} ${film}
             <div class="delete"></div>
         </li>
     `;
-    });
+        });
+
+        document.querySelectorAll('.delete').forEach((btn, i) => {
+            btn.addEventListener('click', () => {
+                btn.parentElement.remove();
+                movieDB.movies.splice(i, 1);
+
+                createMovieList(films, parent);
+            });
+        });
+    }
+
+    deleteAdv(adv);
+    makeChanges();
+    createMovieList(movieDB.movies, movieList);
 });
